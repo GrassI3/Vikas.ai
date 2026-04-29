@@ -70,12 +70,12 @@ function updateKPIs(data) {
   $("#kpi-groq-value").style.color = data.groq_configured ? "var(--accent-emerald)" : "var(--accent-rose)";
   $("#kpi-vapi-value").textContent = data.vapi_configured ? "✓ Ready" : "✗ Missing";
   $("#kpi-vapi-value").style.color = data.vapi_configured ? "var(--accent-emerald)" : "var(--accent-rose)";
-  $("#kpi-bhashini-value").textContent = data.bhashini_configured ? "✓ Ready" : "✗ Missing";
-  $("#kpi-bhashini-value").style.color = data.bhashini_configured ? "var(--accent-emerald)" : "var(--accent-rose)";
+  $("#kpi-twilio-value").textContent = data.twilio_configured ? "✓ Ready" : "✗ Missing";
+  $("#kpi-twilio-value").style.color = data.twilio_configured ? "var(--accent-emerald)" : "var(--accent-rose)";
 }
 
 function updateKPIsOffline() {
-  ["#kpi-docs-value", "#kpi-groq-value", "#kpi-vapi-value", "#kpi-bhashini-value"].forEach((sel) => {
+  ["#kpi-docs-value", "#kpi-groq-value", "#kpi-vapi-value", "#kpi-twilio-value"].forEach((sel) => {
     $(sel).textContent = "—";
     $(sel).style.color = "";
   });

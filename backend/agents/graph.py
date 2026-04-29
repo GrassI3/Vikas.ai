@@ -13,7 +13,8 @@ Flow:
 from __future__ import annotations
 
 import logging
-from typing import Any
+import operator
+from typing import Any, Annotated, TypedDict
 
 from langgraph.graph import END, StateGraph
 
@@ -26,6 +27,45 @@ from backend.agents.nodes import (
 from backend.agents.state import Severity
 
 logger = logging.getLogger("vikas.agents.graph")
+
+
+# ── Typed state schema for LangGraph ────────────────────────
+# Using a TypedDict ensures LangGraph merges node outputs into
+# the shared state correctly across all nodes.
+def _replace(a, b):
+    """Reducer that always takes the new value."""
+    return b
+
+
+class PipelineState(TypedDict, total=False):
+    """Shared state flowing through every node in the reasoning graph."""
+    # User Input (set once at entry, never overwritten by nodes)
+    session_id: str
+    user_utterance: str
+    translated_utterance: str
+    detected_language: str
+    conversation_history: list[dict[str, str]]
+    turn_count: int
+
+    # Intake / Triage
+    severity: str
+    domain: str
+    sentiment_score: float
+    intake_summary: str
+
+    # Retrieval
+    retrieval_query: str
+    retrieved_documents: list[dict[str, Any]]
+
+    # Reasoning
+    reasoning_chain: list[str]
+    confidence: float
+    hypotheses: list[dict[str, Any]]
+
+    # Synthesis
+    final_response_en: str
+    citations: list[str]
+    disclaimer_injected: bool
 
 
 # ── Routing function ────────────────────────────────────────
@@ -43,14 +83,14 @@ def _route_after_intake(state: dict[str, Any]) -> str:
     return "retrieval"
 
 
-def build_graph() -> StateGraph:
+def build_graph():
     """
     Construct and compile the LangGraph reasoning pipeline.
 
-    Returns a compiled graph that accepts an AgentState dict and
+    Returns a compiled graph that accepts a PipelineState dict and
     returns the mutated state after traversing all nodes.
     """
-    graph = StateGraph(dict)
+    graph = StateGraph(PipelineState)
 
     # ── Register nodes ──────────────────────────────────────
     graph.add_node("intake", intake_node)
@@ -90,7 +130,7 @@ async def run_pipeline(state: dict[str, Any]) -> dict[str, Any]:
     Execute the full reasoning pipeline for a single conversational turn.
 
     Args:
-        state: A dict matching the AgentState schema with at minimum
+        state: A dict matching the PipelineState schema with at minimum
                `user_utterance` populated.
 
     Returns:

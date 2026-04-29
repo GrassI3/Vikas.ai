@@ -120,7 +120,7 @@ async def health_check():
         "knowledge_base_docs": collection.count(),
         "groq_configured": bool(settings.groq_api_key),
         "vapi_configured": bool(settings.vapi_api_key),
-        "bhashini_configured": bool(settings.bhashini_api_key),
+        "twilio_configured": bool(settings.twilio_account_sid),
     }
 
 
@@ -177,6 +177,34 @@ async def ingest_documents(request: IngestRequest):
 
     count = await add_documents(request.documents)
     return {"status": "ok", "documents_ingested": count}
+
+
+class PubMedRequest(BaseModel):
+    """PubMed ingestion request."""
+    topic: str | None = None
+    all_defaults: bool = False
+    max_per_topic: int = 20
+
+
+@app.post("/api/pubmed/ingest", tags=["Knowledge"])
+async def ingest_pubmed(request: PubMedRequest):
+    """Bulk-ingest PubMed abstracts by topic or all defaults."""
+    from backend.knowledge.pubmed import ingest_pubmed_topic, ingest_all_default_topics
+
+    if request.all_defaults:
+        count = await ingest_all_default_topics(max_per_topic=request.max_per_topic)
+    elif request.topic:
+        count = await ingest_pubmed_topic(request.topic, max_articles=request.max_per_topic)
+    else:
+        return {"status": "error", "message": "Provide 'topic' or set 'all_defaults' to true"}
+
+    # Refresh health check count
+    collection = get_or_create_collection()
+    return {
+        "status": "ok",
+        "articles_ingested": count,
+        "total_knowledge_base": collection.count(),
+    }
 
 
 # ── WebSocket — Live Transcript Stream ──────────────────────

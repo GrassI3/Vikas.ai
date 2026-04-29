@@ -68,6 +68,7 @@ async def intake_node(state: dict[str, Any]) -> dict[str, Any]:
 
     resp = await client.chat.completions.create(
         model=settings.groq_model,
+        response_format={"type": "json_object"},
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": utterance},
@@ -77,9 +78,18 @@ async def intake_node(state: dict[str, Any]) -> dict[str, Any]:
     )
 
     try:
-        parsed = json.loads(resp.choices[0].message.content)
-    except (json.JSONDecodeError, IndexError):
-        logger.error("Intake LLM response was not valid JSON — falling back to defaults")
+        content = resp.choices[0].message.content.strip()
+        if content.startswith("```"):
+            content = "\n".join(content.split("\n")[1:-1])
+        parsed = json.loads(content)
+        
+        # Log parsed keys for debugging
+        logger.info("Intake parsed keys: %s", list(parsed.keys()))
+        if "intake_summary" not in parsed:
+            logger.error("Intake JSON missing 'intake_summary'. Full JSON: %s", content)
+            
+    except (json.JSONDecodeError, IndexError) as e:
+        logger.error("Intake LLM response was not valid JSON: %s. Response: %s", e, resp.choices[0].message.content)
         parsed = {
             "domain": Domain.GENERAL.value,
             "severity": Severity.LOW.value,
@@ -91,23 +101,54 @@ async def intake_node(state: dict[str, Any]) -> dict[str, Any]:
         "severity": parsed.get("severity", Severity.LOW.value),
         "domain": parsed.get("domain", Domain.GENERAL.value),
         "sentiment_score": parsed.get("sentiment_score", 0.0),
-        "intake_summary": parsed.get("intake_summary", ""),
+        "intake_summary": parsed.get("intake_summary", "General inquiry."),
     }
 
 
 # ────────────────────────────────────────────────────────────
-# Node 2 — Retrieval & Grounding
+# Node 2 — Retrieval & Grounding (Dynamic PubMed fallback)
 # ────────────────────────────────────────────────────────────
 async def retrieval_node(state: dict[str, Any]) -> dict[str, Any]:
     """
-    Build a targeted search query from the intake summary,
-    then retrieve the top-k most relevant documents from ChromaDB.
+    Semantic search over ChromaDB. If the top result's relevance is below
+    a threshold, automatically searches PubMed for the user's specific
+    query, ingests new abstracts on-the-fly, and re-queries.
     """
     utterance = state.get("translated_utterance") or state.get("user_utterance", "")
     intake_summary = state.get("intake_summary", "")
-    retrieval_query = f"{intake_summary}. User said: {utterance}"
+    retrieval_query = f"{intake_summary}. {utterance}"
 
+    # ── First pass against existing KB ────────────────────────
     docs = await query_knowledge_base(retrieval_query, n_results=5)
+
+    # ── Dynamic PubMed enrichment ───────────────────────────
+    # If best match score is below threshold, the KB doesn't have good
+    # coverage for this topic — auto-fetch from PubMed right now.
+    RELEVANCE_THRESHOLD = 0.45
+    top_score = docs[0]["relevance_score"] if docs else 0.0
+
+    if top_score < RELEVANCE_THRESHOLD:
+        logger.info(
+            "Low relevance (%.4f < %.2f) — auto-fetching from PubMed for: %s",
+            top_score, RELEVANCE_THRESHOLD, intake_summary,
+        )
+        try:
+            from backend.knowledge.pubmed import ingest_pubmed_topic
+            # Use the intake summary as the PubMed search query
+            pubmed_query = intake_summary if intake_summary and intake_summary != "General inquiry." else utterance
+            new_count = await ingest_pubmed_topic(pubmed_query, max_articles=15)
+            logger.info("PubMed auto-fetch: %d new articles ingested", new_count)
+
+            if new_count > 0:
+                # Re-query now that KB is enriched
+                docs = await query_knowledge_base(retrieval_query, n_results=5)
+                logger.info(
+                    "Re-query after PubMed fetch: top score now %.4f",
+                    docs[0]["relevance_score"] if docs else 0.0,
+                )
+        except Exception as e:
+            logger.error("PubMed auto-fetch failed: %s", e)
+            # Continue with whatever docs we have
 
     retrieved = [
         {
@@ -143,14 +184,16 @@ async def reasoning_node(state: dict[str, Any]) -> dict[str, Any]:
     )
 
     system_prompt = (
-        "You are a medical reasoning agent. You MUST think step-by-step.\n"
+        "You are an expert medical reasoning agent with access to peer-reviewed literature. "
+        "You MUST think step-by-step like a clinician performing a differential diagnosis.\n"
         "Given the user's situation and the retrieved medical literature below, "
         "produce a JSON object with:\n"
-        "  reasoning_chain: list[str] — each step of your logical deduction\n"
-        "  hypotheses: list[{hypothesis: str, confidence: float}] — ranked possibilities\n"
+        "  reasoning_chain: list[str] — each step of your clinical deduction, referencing specific studies\n"
+        "  hypotheses: list[{hypothesis: str, confidence: float}] — ranked differential diagnoses\n"
         "  confidence: float — overall confidence in your top hypothesis (0-1)\n"
-        "Use ONLY information from the provided documents. If the documents lack coverage, "
-        "state so explicitly. No markdown fences."
+        "Be specific and clinical. Name conditions, mechanisms, and cite the literature. "
+        "Do NOT hedge unnecessarily. If the evidence supports a conclusion, state it directly. "
+        "No markdown fences."
     )
 
     user_prompt = (
@@ -162,6 +205,7 @@ async def reasoning_node(state: dict[str, Any]) -> dict[str, Any]:
     client = _get_groq()
     resp = await client.chat.completions.create(
         model=settings.groq_model,
+        response_format={"type": "json_object"},
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
@@ -171,17 +215,31 @@ async def reasoning_node(state: dict[str, Any]) -> dict[str, Any]:
     )
 
     try:
-        parsed = json.loads(resp.choices[0].message.content)
-    except (json.JSONDecodeError, IndexError):
-        logger.error("Reasoning LLM output was not valid JSON")
+        content = resp.choices[0].message.content.strip()
+        if content.startswith("```"):
+            content = "\n".join(content.split("\n")[1:-1])
+        parsed = json.loads(content)
+        
+        logger.info("Reasoning parsed keys: %s", list(parsed.keys()))
+        if "reasoning_chain" not in parsed:
+            logger.error("Reasoning JSON missing 'reasoning_chain'. Full JSON: %s", content)
+            
+    except (json.JSONDecodeError, IndexError) as e:
+        logger.error("Reasoning LLM output was not valid JSON: %s. Response: %s", e, resp.choices[0].message.content)
         parsed = {
             "reasoning_chain": ["Unable to parse reasoning output."],
             "hypotheses": [],
             "confidence": 0.0,
         }
 
+    # Ensure reasoning_chain is actually a list and has items
+    chain = parsed.get("reasoning_chain", [])
+    if not isinstance(chain, list) or len(chain) == 0:
+        logger.warning("Reasoning chain was empty or not a list. Original parsed: %s", parsed)
+        chain = ["Model evaluated the query but returned no specific reasoning steps."]
+
     return {
-        "reasoning_chain": parsed.get("reasoning_chain", []),
+        "reasoning_chain": chain,
         "hypotheses": parsed.get("hypotheses", []),
         "confidence": parsed.get("confidence", 0.0),
     }
@@ -223,15 +281,18 @@ async def synthesis_node(state: dict[str, Any]) -> dict[str, Any]:
     )
 
     system_prompt = (
-        "You are a compassionate health-information synthesis agent speaking to a patient "
-        "over the phone. Produce a clear, concise spoken response that:\n"
-        "  1. Summarises the most likely situation in plain language.\n"
-        "  2. Cites the source of each key fact (e.g., 'According to NIH guidelines…').\n"
-        "  3. Provides 1-3 actionable next steps.\n"
-        "  4. Ends with a standard reminder that this is automated information, not a "
-        "licensed medical opinion.\n"
-        "CRITICAL INSTRUCTION: You MUST produce your final response in the exact SAME LANGUAGE that the user spoke in. "
-        "Do not respond in English unless the user spoke in English. Keep sentences short for voice delivery. Do NOT use markdown."
+        "You are a knowledgeable medical assistant powered by peer-reviewed PubMed literature. "
+        "You provide DIRECT, SPECIFIC medical guidance. You are NOT a generic chatbot.\n"
+        "Produce a clear, evidence-based response that:\n"
+        "  1. States the most likely diagnosis or condition based on the clinical reasoning.\n"
+        "  2. Explains WHY, citing specific studies (e.g., 'According to a study in The Lancet (PMID:12345)...').\n"
+        "  3. Provides specific treatment options and actionable medical advice.\n"
+        "  4. Lists red-flag symptoms that would require emergency care.\n"
+        "  5. Ends with a brief note that a doctor visit is recommended for confirmation.\n"
+        "Be assertive and helpful. Do NOT be vague. Do NOT say 'I cannot provide medical advice'. "
+        "You ARE providing medical information backed by published research. "
+        "CRITICAL INSTRUCTION: Respond in the SAME LANGUAGE the user spoke in. "
+        "Keep sentences clear for voice delivery. Do NOT use markdown."
     )
 
     user_prompt = (
@@ -254,12 +315,12 @@ async def synthesis_node(state: dict[str, Any]) -> dict[str, Any]:
 
     final_text = resp.choices[0].message.content.strip()
 
-    # ── Append standard disclaimer for HIGH severity ─────────
+    # ── Append brief note for HIGH severity ──────────────────
     disclaimer_injected = False
     if severity in (Severity.HIGH.value, Severity.HIGH):
         final_text += (
-            "\n\nImportant: I am an automated informational service and not a medical "
-            "professional. If your symptoms worsen, please seek immediate medical attention."
+            "\n\nGiven the severity of your symptoms, I strongly recommend seeking "
+            "medical attention within the next few hours."
         )
         disclaimer_injected = True
 

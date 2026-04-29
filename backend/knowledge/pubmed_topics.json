@@ -1,0 +1,25 @@
+{
+  "_comment": "PubMed ingestion topics for Vikas.ai. Add or remove topics freely. Uses NCBI E-utilities search syntax.",
+  "topics": [
+    "headache diagnosis treatment",
+    "fever differential diagnosis adults",
+    "chest pain emergency triage",
+    "anxiety disorder CBT treatment",
+    "diabetes type 2 management guidelines",
+    "hypertension treatment first line",
+    "asthma acute management",
+    "malaria diagnosis treatment India",
+    "tuberculosis symptoms treatment",
+    "dengue fever clinical management",
+    "diarrhea dehydration oral rehydration",
+    "pregnancy complications warning signs",
+    "childhood immunization schedule",
+    "snake bite first aid antivenom",
+    "burn injury management wound care",
+    "depression treatment SSRI counseling",
+    "stroke symptoms FAST recognition",
+    "heart attack myocardial infarction emergency",
+    "pneumonia community acquired treatment",
+    "urinary tract infection diagnosis antibiotics"
+  ]
+}

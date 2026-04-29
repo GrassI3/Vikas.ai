@@ -32,10 +32,10 @@ class Settings(BaseSettings):
     chroma_collection_name: str = Field(default="vikas_knowledge", description="Default ChromaDB collection name")
     embedding_model: str = Field(default="all-MiniLM-L6-v2", description="Local sentence-transformer embedding model")
 
-    # ── Bhashini (Multilingual Translation) ──────────────────
-    bhashini_api_key: str = Field(default="", description="Bhashini ULCA API key")
-    bhashini_user_id: str = Field(default="", description="Bhashini user ID")
-    bhashini_pipeline_id: str = Field(default="", description="Bhashini pipeline config ID")
+    # ── Twilio (SMS Fallback) ────────────────────────────────
+    twilio_account_sid: str = Field(default="", description="Twilio Account SID")
+    twilio_auth_token: str = Field(default="", description="Twilio Auth Token")
+    twilio_phone_number: str = Field(default="", description="Twilio provisioned phone number")
 
     # ── Safety Thresholds ────────────────────────────────────
     emergency_keywords: list[str] = Field(

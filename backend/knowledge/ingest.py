@@ -132,7 +132,7 @@ async def main():
     if args.seed or not args.source:
         total += await ingest_seed_data()
 
-    print(f"\n✅ Ingestion complete — {total} documents added to knowledge base.\n")
+    print(f"\n[OK] Ingestion complete — {total} documents added to knowledge base.\n")
 
 
 if __name__ == "__main__":
