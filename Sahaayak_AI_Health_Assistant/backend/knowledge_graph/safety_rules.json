@@ -1,0 +1,62 @@
+{
+  "description": "Symbolic Safety Gate rules",
+  "version": "1.0",
+  "rules": [
+    {
+      "id": "RULE_CHEST_PAIN",
+      "keywords": ["chest pain", "seene mein dard", "chhati mein dard", "dil mein dard", "chaatit dukhne"],
+      "override_to": "EMERGENCY",
+      "flag": "CARDIAC_ALERT",
+      "action": "Recommend calling 108 immediately."
+    },
+    {
+      "id": "RULE_STROKE_SIGNS",
+      "keywords": ["stroke", "lakwa", "face drooping", "arm weakness", "speech difficulty", "bolne mein dikkat", "haath pair sun", "pakshaghat"],
+      "override_to": "EMERGENCY",
+      "flag": "STROKE_ALERT",
+      "action": "FAST protocol. Call 108 immediately."
+    },
+    {
+      "id": "RULE_UNCONSCIOUS",
+      "keywords": ["unconscious", "behosh", "hosh nahi", "not responding", "collapsed", "gir gaya", "beshudh"],
+      "override_to": "EMERGENCY",
+      "flag": "UNCONSCIOUS_ALERT",
+      "action": "Check airway. Recovery position. Call 108."
+    },
+    {
+      "id": "RULE_SUICIDAL",
+      "keywords": ["suicide", "aatmhatya", "kill myself", "want to die", "mar jaana", "jeena nahi chahta", "khatam kar lena", "end my life", "self harm"],
+      "override_to": "EMERGENCY",
+      "flag": "CRISIS_MENTAL_HEALTH",
+      "action": "Crisis intervention. iCall: 9152987821. Vandrevala: 1860-2662-345."
+    },
+    {
+      "id": "RULE_SEVERE_BLEEDING",
+      "keywords": ["uncontrolled bleeding", "khoon nahi ruk raha", "hemorrhage", "bahut khoon", "blood loss"],
+      "override_to": "EMERGENCY",
+      "flag": "HEMORRHAGE_ALERT",
+      "action": "Apply direct pressure. Call 108."
+    },
+    {
+      "id": "RULE_BREATHING_CRISIS",
+      "keywords": ["cannot breathe", "saans nahi aa rahi", "choking", "gala ghut raha", "blue lips", "dam ghutna", "suffocating"],
+      "override_to": "EMERGENCY",
+      "flag": "RESPIRATORY_CRISIS",
+      "action": "Check for obstruction. Call 108."
+    },
+    {
+      "id": "RULE_SEIZURE",
+      "keywords": ["seizure", "mirgi", "fits", "convulsion", "jhatkhe", "body shaking"],
+      "override_to": "EMERGENCY",
+      "flag": "SEIZURE_ALERT",
+      "action": "Clear surroundings. Do NOT restrain. Call 108 if >5 min."
+    },
+    {
+      "id": "RULE_ANAPHYLAXIS",
+      "keywords": ["allergic reaction severe", "swelling throat", "gala sooj", "saans band", "anaphylaxis"],
+      "override_to": "EMERGENCY",
+      "flag": "ANAPHYLAXIS_ALERT",
+      "action": "Administer epinephrine if available. Call 108."
+    }
+  ]
+}

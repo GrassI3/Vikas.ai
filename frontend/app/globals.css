@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #f8f9ff;
+  --color-surface-dim: #d0dbed;
+  --color-surface-bright: #f8f9ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #eff4ff;
+  --color-surface-container: #e6eeff;
+  --color-surface-container-high: #dee9fc;
+  --color-surface-container-highest: #d9e3f6;
+  --color-on-surface: #121c2a;
+  --color-on-surface-variant: #434655;
+  --color-inverse-surface: #27313f;
+  --color-inverse-on-surface: #eaf1ff;
+  --color-outline: #737686;
+  --color-outline-variant: #c3c6d7;
+  --color-surface-tint: #0053db;
+  --color-primary: #004ac6;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #2563eb;
+  --color-on-primary-container: #eeefff;
+  --color-inverse-primary: #b4c5ff;
+  --color-secondary: #bb0112;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #e02928;
+  --color-on-secondary-container: #fffbff;
+  --color-tertiary: #525557;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #6b6d6f;
+  --color-on-tertiary-container: #eff0f2;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-primary-fixed: #dbe1ff;
+  --color-primary-fixed-dim: #b4c5ff;
+  --color-on-primary-fixed: #00174b;
+  --color-on-primary-fixed-variant: #003ea8;
+  --color-secondary-fixed: #ffdad6;
+  --color-secondary-fixed-dim: #ffb4ab;
+  --color-on-secondary-fixed: #410002;
+  --color-on-secondary-fixed-variant: #93000b;
+  --color-tertiary-fixed: #e1e2e4;
+  --color-tertiary-fixed-dim: #c5c6c8;
+  --color-on-tertiary-fixed: #191c1e;
+  --color-on-tertiary-fixed-variant: #444749;
+  --color-background: #f8f9ff;
+  --color-on-background: #121c2a;
+  
+  --font-inter: var(--font-inter);
+  --font-label-bold: var(--font-inter);
+  --font-caption: var(--font-inter);
+  --font-chat-bubble: var(--font-inter);
+  --font-h3: var(--font-inter);
+  --font-h1: var(--font-inter);
+  --font-body: var(--font-inter);
+  --font-h2: var(--font-inter);
+
+  --text-label-bold: 14px;
+  --text-label-bold--line-height: 1;
+  --text-label-bold--font-weight: 600;
+
+  --text-caption: 12px;
+  --text-caption--line-height: 1.2;
+  --text-caption--font-weight: 500;
+
+  --text-chat-bubble: 18px;
+  --text-chat-bubble--line-height: 1.5;
+  --text-chat-bubble--font-weight: 400;
+
+  --text-h3: 20px;
+  --text-h3--line-height: 1.4;
+  --text-h3--font-weight: 600;
+
+  --text-h1: 32px;
+  --text-h1--line-height: 1.2;
+  --text-h1--font-weight: 700;
+
+  --text-body: 16px;
+  --text-body--line-height: 1.6;
+  --text-body--font-weight: 400;
+
+  --text-h2: 24px;
+  --text-h2--line-height: 1.3;
+  --text-h2--font-weight: 600;
+
+  --spacing-base-unit: 4px;
+  --spacing-margin-mobile: 20px;
+  --spacing-md: 16px;
+  --spacing-gutter: 16px;
+  --spacing-sm: 12px;
+  --spacing-lg: 24px;
+  --spacing-xs: 8px;
+  --spacing-xl: 32px;
+}

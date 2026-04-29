@@ -1,0 +1,23 @@
+# Core ML
+torch>=2.2.0
+transformers>=4.40.0
+datasets>=2.19.0
+captum>=0.7.0
+accelerate>=0.30.0
+
+# Serving
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.7.0
+
+# Knowledge Graph
+rapidfuzz>=3.9.0
+pyld>=2.0.0
+
+# Data & Storage
+aiosqlite>=0.20.0
+pandas>=2.2.0
+scikit-learn>=1.5.0
+
+# Indic NLP
+indic-nlp-library>=0.91

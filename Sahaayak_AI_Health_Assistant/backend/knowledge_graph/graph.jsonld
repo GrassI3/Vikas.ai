@@ -1,0 +1,201 @@
+{
+  "@context": {
+    "med": "https://sahaayak.ai/ontology/medical#",
+    "indic": "https://sahaayak.ai/ontology/indic#",
+    "schema": "https://schema.org/"
+  },
+  "@graph": [
+    {
+      "@id": "med:Anxiety",
+      "@type": "med:Condition",
+      "med:clinicalName": "Generalized Anxiety Disorder",
+      "med:defaultSeverity": "MODERATE",
+      "indic:idioms": [
+        { "indic:term": "ghabrahat", "indic:lang": "hi", "indic:literal": "घबराहट", "indic:context": "feeling of panic or nervousness" },
+        { "indic:term": "ghabra jaana", "indic:lang": "hi", "indic:literal": "घबरा जाना", "indic:context": "to become panicked" },
+        { "indic:term": "dhak dhak", "indic:lang": "hi", "indic:literal": "धक धक", "indic:context": "palpitations / racing heart" },
+        { "indic:term": "dil ghabrana", "indic:lang": "hi", "indic:literal": "दिल घबराना", "indic:context": "heart racing with anxiety" },
+        { "indic:term": "bechaini", "indic:lang": "hi", "indic:literal": "बेचैनी", "indic:context": "restlessness / unease" },
+        { "indic:term": "kaalji", "indic:lang": "mr", "indic:literal": "काळजी", "indic:context": "worry / concern" }
+      ],
+      "med:relatedSymptoms": ["med:Palpitations", "med:ShortnessOfBreath", "med:Sweating"],
+      "med:escalationTriggers": ["suicidal_ideation", "self_harm", "panic_attack_prolonged"]
+    },
+    {
+      "@id": "med:ChestPain",
+      "@type": "med:Condition",
+      "med:clinicalName": "Acute Chest Pain",
+      "med:defaultSeverity": "EMERGENCY",
+      "indic:idioms": [
+        { "indic:term": "seene mein dard", "indic:lang": "hi", "indic:literal": "सीने में दर्द", "indic:context": "pain in the chest" },
+        { "indic:term": "chhati mein dard", "indic:lang": "hi", "indic:literal": "छाती में दर्द", "indic:context": "chest pain" },
+        { "indic:term": "dil mein dard", "indic:lang": "hi", "indic:literal": "दिल में दर्द", "indic:context": "heart pain" },
+        { "indic:term": "chaatit dukhne", "indic:lang": "mr", "indic:literal": "छातीत दुखणे", "indic:context": "chest hurting" }
+      ],
+      "med:relatedSymptoms": ["med:ShortnessOfBreath", "med:Sweating", "med:ArmPain"],
+      "med:escalationTriggers": ["radiating_pain", "jaw_pain", "cold_sweat"]
+    },
+    {
+      "@id": "med:Fever",
+      "@type": "med:Condition",
+      "med:clinicalName": "Pyrexia",
+      "med:defaultSeverity": "LOW",
+      "indic:idioms": [
+        { "indic:term": "bukhar", "indic:lang": "hi", "indic:literal": "बुखार", "indic:context": "fever" },
+        { "indic:term": "tez bukhar", "indic:lang": "hi", "indic:literal": "तेज़ बुखार", "indic:context": "high fever" },
+        { "indic:term": "badan garam", "indic:lang": "hi", "indic:literal": "बदन गरम", "indic:context": "body feels hot" },
+        { "indic:term": "taap", "indic:lang": "mr", "indic:literal": "ताप", "indic:context": "fever / temperature" },
+        { "indic:term": "thandi lagana", "indic:lang": "hi", "indic:literal": "ठंडी लगना", "indic:context": "feeling chills" }
+      ],
+      "med:relatedSymptoms": ["med:Chills", "med:BodyAche", "med:Fatigue"],
+      "med:escalationTriggers": ["fever_above_103", "duration_over_3_days", "with_rash", "with_neck_stiffness"]
+    },
+    {
+      "@id": "med:Headache",
+      "@type": "med:Condition",
+      "med:clinicalName": "Cephalgia",
+      "med:defaultSeverity": "LOW",
+      "indic:idioms": [
+        { "indic:term": "sir dard", "indic:lang": "hi", "indic:literal": "सिर दर्द", "indic:context": "headache" },
+        { "indic:term": "sir mein dard", "indic:lang": "hi", "indic:literal": "सिर में दर्द", "indic:context": "pain in head" },
+        { "indic:term": "matha bhari", "indic:lang": "hi", "indic:literal": "माथा भारी", "indic:context": "heaviness in forehead" },
+        { "indic:term": "dokhe dukhne", "indic:lang": "mr", "indic:literal": "डोके दुखणे", "indic:context": "head hurting" }
+      ],
+      "med:relatedSymptoms": ["med:Nausea", "med:Dizziness", "med:Photophobia"],
+      "med:escalationTriggers": ["thunderclap_onset", "worst_headache_ever", "with_fever_stiff_neck", "with_vision_loss"]
+    },
+    {
+      "@id": "med:Dizziness",
+      "@type": "med:Condition",
+      "med:clinicalName": "Vertigo / Presyncope",
+      "med:defaultSeverity": "MODERATE",
+      "indic:idioms": [
+        { "indic:term": "chakkar", "indic:lang": "hi", "indic:literal": "चक्कर", "indic:context": "dizziness / spinning" },
+        { "indic:term": "chakkar aana", "indic:lang": "hi", "indic:literal": "चक्कर आना", "indic:context": "feeling dizzy" },
+        { "indic:term": "sir ghoomna", "indic:lang": "hi", "indic:literal": "सिर घूमना", "indic:context": "head spinning" },
+        { "indic:term": "bhirabhiri", "indic:lang": "mr", "indic:literal": "भिरभिर", "indic:context": "lightheadedness" }
+      ],
+      "med:relatedSymptoms": ["med:Nausea", "med:Fainting", "med:HearingLoss"],
+      "med:escalationTriggers": ["with_slurred_speech", "with_limb_weakness", "recurrent_fainting"]
+    },
+    {
+      "@id": "med:AbdominalPain",
+      "@type": "med:Condition",
+      "med:clinicalName": "Abdominal Pain",
+      "med:defaultSeverity": "MODERATE",
+      "indic:idioms": [
+        { "indic:term": "pet dard", "indic:lang": "hi", "indic:literal": "पेट दर्द", "indic:context": "stomach pain" },
+        { "indic:term": "pet mein marod", "indic:lang": "hi", "indic:literal": "पेट में मरोड़", "indic:context": "abdominal cramps" },
+        { "indic:term": "pet phoolna", "indic:lang": "hi", "indic:literal": "पेट फूलना", "indic:context": "bloating" },
+        { "indic:term": "potaat dukhne", "indic:lang": "mr", "indic:literal": "पोटात दुखणे", "indic:context": "stomach hurting" }
+      ],
+      "med:relatedSymptoms": ["med:Nausea", "med:Vomiting", "med:Diarrhea"],
+      "med:escalationTriggers": ["right_lower_quadrant", "rigid_abdomen", "with_blood_in_stool"]
+    },
+    {
+      "@id": "med:ShortnessOfBreath",
+      "@type": "med:Condition",
+      "med:clinicalName": "Dyspnea",
+      "med:defaultSeverity": "HIGH",
+      "indic:idioms": [
+        { "indic:term": "saans phoolna", "indic:lang": "hi", "indic:literal": "सांस फूलना", "indic:context": "breathlessness" },
+        { "indic:term": "saans lene mein taklif", "indic:lang": "hi", "indic:literal": "सांस लेने में तकलीफ़", "indic:context": "difficulty breathing" },
+        { "indic:term": "dam ghutna", "indic:lang": "hi", "indic:literal": "दम घुटना", "indic:context": "suffocation feeling" },
+        { "indic:term": "shwaas ghenyas tras", "indic:lang": "mr", "indic:literal": "श्वास घेण्यास त्रास", "indic:context": "trouble breathing" }
+      ],
+      "med:relatedSymptoms": ["med:Wheezing", "med:ChestPain", "med:Cough"],
+      "med:escalationTriggers": ["at_rest", "blue_lips", "unable_to_speak_sentences"]
+    },
+    {
+      "@id": "med:Depression",
+      "@type": "med:Condition",
+      "med:clinicalName": "Major Depressive Disorder",
+      "med:defaultSeverity": "MODERATE",
+      "indic:idioms": [
+        { "indic:term": "udaasi", "indic:lang": "hi", "indic:literal": "उदासी", "indic:context": "sadness / melancholy" },
+        { "indic:term": "mann nahi lagta", "indic:lang": "hi", "indic:literal": "मन नहीं लगता", "indic:context": "lack of interest" },
+        { "indic:term": "jeene ka mann nahi", "indic:lang": "hi", "indic:literal": "जीने का मन नहीं", "indic:context": "no will to live (CRISIS)" },
+        { "indic:term": "niraasha", "indic:lang": "mr", "indic:literal": "निराशा", "indic:context": "hopelessness" },
+        { "indic:term": "man udas aahe", "indic:lang": "mr", "indic:literal": "मन उदास आहे", "indic:context": "feeling sad" }
+      ],
+      "med:relatedSymptoms": ["med:Insomnia", "med:Fatigue", "med:AppetiteLoss"],
+      "med:escalationTriggers": ["suicidal_ideation", "self_harm", "substance_abuse"]
+    },
+    {
+      "@id": "med:Unconsciousness",
+      "@type": "med:Condition",
+      "med:clinicalName": "Loss of Consciousness",
+      "med:defaultSeverity": "EMERGENCY",
+      "indic:idioms": [
+        { "indic:term": "behosh", "indic:lang": "hi", "indic:literal": "बेहोश", "indic:context": "unconscious" },
+        { "indic:term": "hosh nahi", "indic:lang": "hi", "indic:literal": "होश नहीं", "indic:context": "not conscious" },
+        { "indic:term": "gir gaya", "indic:lang": "hi", "indic:literal": "गिर गया", "indic:context": "collapsed / fell down" },
+        { "indic:term": "beshudh", "indic:lang": "mr", "indic:literal": "बेशुद्ध", "indic:context": "unconscious" }
+      ],
+      "med:relatedSymptoms": ["med:Seizure", "med:Trauma", "med:Hypoglycemia"],
+      "med:escalationTriggers": ["always_emergency"]
+    },
+    {
+      "@id": "med:Stroke",
+      "@type": "med:Condition",
+      "med:clinicalName": "Cerebrovascular Accident",
+      "med:defaultSeverity": "EMERGENCY",
+      "indic:idioms": [
+        { "indic:term": "lakwa", "indic:lang": "hi", "indic:literal": "लकवा", "indic:context": "paralysis" },
+        { "indic:term": "haath pair sun", "indic:lang": "hi", "indic:literal": "हाथ पैर सुन", "indic:context": "numbness in limbs" },
+        { "indic:term": "bolne mein dikkat", "indic:lang": "hi", "indic:literal": "बोलने में दिक्कत", "indic:context": "difficulty speaking" },
+        { "indic:term": "pakshaghat", "indic:lang": "mr", "indic:literal": "पक्षाघात", "indic:context": "paralysis / stroke" }
+      ],
+      "med:relatedSymptoms": ["med:FacialDrooping", "med:SpeechDifficulty", "med:LimbWeakness"],
+      "med:escalationTriggers": ["always_emergency"]
+    },
+    {
+      "@id": "med:Vomiting",
+      "@type": "med:Condition",
+      "med:clinicalName": "Emesis",
+      "med:defaultSeverity": "LOW",
+      "indic:idioms": [
+        { "indic:term": "ulti", "indic:lang": "hi", "indic:literal": "उल्टी", "indic:context": "vomiting" },
+        { "indic:term": "ji machlana", "indic:lang": "hi", "indic:literal": "जी मचलना", "indic:context": "nausea / queasy" },
+        { "indic:term": "khai aana", "indic:lang": "hi", "indic:literal": "कै आना", "indic:context": "throwing up" },
+        { "indic:term": "ulti hone", "indic:lang": "mr", "indic:literal": "उलटी होणे", "indic:context": "vomiting" }
+      ],
+      "med:relatedSymptoms": ["med:Nausea", "med:Dehydration", "med:AbdominalPain"],
+      "med:escalationTriggers": ["blood_in_vomit", "persistent_over_24h", "with_severe_headache"]
+    },
+    {
+      "@id": "med:Diarrhea",
+      "@type": "med:Condition",
+      "med:clinicalName": "Acute Diarrheal Disease",
+      "med:defaultSeverity": "LOW",
+      "indic:idioms": [
+        { "indic:term": "dast", "indic:lang": "hi", "indic:literal": "दस्त", "indic:context": "loose motions" },
+        { "indic:term": "pet kharab", "indic:lang": "hi", "indic:literal": "पेट खराब", "indic:context": "upset stomach" },
+        { "indic:term": "loose motion", "indic:lang": "hi", "indic:literal": "लूज़ मोशन", "indic:context": "diarrhea (common usage)" },
+        { "indic:term": "jullaab", "indic:lang": "mr", "indic:literal": "जुलाब", "indic:context": "diarrhea" }
+      ],
+      "med:relatedSymptoms": ["med:Dehydration", "med:Fever", "med:AbdominalPain"],
+      "med:escalationTriggers": ["blood_in_stool", "severe_dehydration", "in_children_under_5"]
+    },
+    {
+      "@id": "med:SuicidalIdeation",
+      "@type": "med:Condition",
+      "med:clinicalName": "Suicidal Ideation — CRISIS",
+      "med:defaultSeverity": "EMERGENCY",
+      "indic:idioms": [
+        { "indic:term": "aatmhatya", "indic:lang": "hi", "indic:literal": "आत्महत्या", "indic:context": "suicide" },
+        { "indic:term": "mar jaana chahta hoon", "indic:lang": "hi", "indic:literal": "मर जाना चाहता हूँ", "indic:context": "want to die" },
+        { "indic:term": "jeena nahi chahta", "indic:lang": "hi", "indic:literal": "जीना नहीं चाहता", "indic:context": "don't want to live" },
+        { "indic:term": "khatam kar lena", "indic:lang": "hi", "indic:literal": "खत्म कर लेना", "indic:context": "end it all" },
+        { "indic:term": "aatmahatya", "indic:lang": "mr", "indic:literal": "आत्महत्या", "indic:context": "suicide" }
+      ],
+      "med:relatedSymptoms": ["med:Depression", "med:SubstanceAbuse", "med:SelfHarm"],
+      "med:escalationTriggers": ["always_emergency"],
+      "med:crisisResources": {
+        "iCall": "9152987821",
+        "vandrevala_foundation": "1860-2662-345",
+        "national_helpline": "108"
+      }
+    }
+  ]
+}
