@@ -1,0 +1,25 @@
+# ── Vikas.ai Dependencies ────────────────────────────────────
+# Core
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.9.0
+pydantic-settings>=2.5.0
+
+# LLM & Agents
+groq>=0.11.0
+langgraph>=0.2.0
+langchain-core>=0.3.0
+
+# Vector Database (RAG)
+chromadb>=0.5.0
+sentence-transformers>=3.0.0
+
+# HTTP Client (Bhashini API)
+httpx>=0.27.0
+
+# WebSockets
+websockets>=13.0
+
+# Utilities
+python-dotenv>=1.0.0
+python-multipart>=0.0.9
