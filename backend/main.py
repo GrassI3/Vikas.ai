@@ -60,7 +60,11 @@ async def lifespan(app: FastAPI):
     # ── Auto-start ngrok tunnel ──────────────────────────────
     tunnel = None
     try:
-        from pyngrok import ngrok
+        from pyngrok import ngrok, conf
+        # Use the pre-installed native ngrok binary (avoids pyngrok auto-download)
+        conf.get_default().ngrok_path = (
+            r"C:\Users\jaiga\AppData\Local\Microsoft\WindowsApps\ngrok.exe"
+        )
         tunnel = ngrok.connect(settings.port, bind_tls=True)
         public_url = tunnel.public_url
         webhook_url = f"{public_url}/api/vapi/webhook"

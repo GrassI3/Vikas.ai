@@ -47,8 +47,9 @@ async def handle_assistant_request(payload: dict[str, Any]) -> dict[str, Any]:
         "assistant": {
             "transcriber": {
                 "provider": "deepgram",
-                "model": "nova-2",
-                # "multi" = Deepgram auto-detects language per utterance.
+                "model": "nova-3",
+                # "multi" = Deepgram multilingual — auto-detects language per utterance.
+                # Matches Vapi dashboard: Provider=Deepgram, Model=Nova 3, Language=Multilingual
                 # Handles Hindi, Tamil, Telugu, Kannada, English, etc.
                 "language": "multi",
                 "smartFormat": True,
