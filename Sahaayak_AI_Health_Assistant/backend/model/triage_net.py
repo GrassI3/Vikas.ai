@@ -78,7 +78,13 @@ class SahaayakTriageNet(nn.Module):
     def tokenizer(self) -> AutoTokenizer:
         """Lazy-loaded tokenizer so we don't serialize it with the model."""
         if self._tokenizer is None:
-            self._tokenizer = AutoTokenizer.from_pretrained(INDICBERT_MODEL_NAME)
+            try:
+                self._tokenizer = AutoTokenizer.from_pretrained(
+                    INDICBERT_MODEL_NAME, local_files_only=True
+                )
+            except Exception:
+                # Fallback: try with network (first-time download)
+                self._tokenizer = AutoTokenizer.from_pretrained(INDICBERT_MODEL_NAME)
         return self._tokenizer
 
     # ------------------------------------------------------------------

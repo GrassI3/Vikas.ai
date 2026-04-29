@@ -24,7 +24,10 @@ class XAIEngine:
     def __init__(self, model: SahaayakTriageNet, device: Optional[torch.device] = None):
         self.model = model
         self.device = device or next(model.parameters()).device
-        self.tokenizer = AutoTokenizer.from_pretrained(INDICBERT_MODEL_NAME)
+        try:
+            self.tokenizer = AutoTokenizer.from_pretrained(INDICBERT_MODEL_NAME, local_files_only=True)
+        except Exception:
+            self.tokenizer = AutoTokenizer.from_pretrained(INDICBERT_MODEL_NAME)
 
         # Target the encoder's word embedding layer
         self.lig = LayerIntegratedGradients(

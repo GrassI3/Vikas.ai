@@ -142,60 +142,106 @@ class FeedbackRequest(BaseModel):
 # ---------------------------------------------------------------------------
 
 SEVERITY_LABELS = {
-    "LOW":       {"en": "Low",       "hi": "कम",      "mr": "कमी"},
-    "MODERATE":  {"en": "Moderate",  "hi": "मध्यम",    "mr": "मध्यम"},
-    "HIGH":      {"en": "High",      "hi": "गंभीर",    "mr": "गंभीर"},
-    "EMERGENCY": {"en": "Emergency", "hi": "आपातकालीन", "mr": "आणीबाणी"},
+    "LOW":       {"en": "Low",       "hi": "कम",      "mr": "कमी",     "bn": "কম",       "te": "తక్కువ",   "ta": "குறைவு",    "gu": "ઓછું",     "kn": "ಕಡಿಮೆ",    "ml": "കുറവ്",     "pa": "ਘੱਟ"},
+    "MODERATE":  {"en": "Moderate",  "hi": "मध्यम",    "mr": "मध्यम",   "bn": "মাঝারি",   "te": "మితమైన",   "ta": "மிதமான",    "gu": "મધ્યમ",    "kn": "ಮಧ್ಯಮ",    "ml": "മിതമായ",   "pa": "ਦਰਮਿਆਨਾ"},
+    "HIGH":      {"en": "High",      "hi": "गंभीर",    "mr": "गंभीर",   "bn": "উচ্চ",     "te": "అధిక",     "ta": "உயர்",      "gu": "ઉચ્ચ",     "kn": "ಹೆಚ್ಚು",     "ml": "ഉയർന്ന",    "pa": "ਉੱਚ"},
+    "EMERGENCY": {"en": "Emergency", "hi": "आपातकालीन", "mr": "आणीबाणी", "bn": "জরুরী",    "te": "అత్యవసర",  "ta": "அவசரம்",    "gu": "કટોકટી",   "kn": "ತುರ್ತು",    "ml": "അടിയന്തരം", "pa": "ਐਮਰਜੈਂਸੀ"},
 }
 
 SEVERITY_DESCRIPTION = {
-    "LOW":       {"en": "This appears to be a mild condition. Monitor symptoms at home.",
-                  "hi": "यह एक हल्की स्थिति प्रतीत होती है। घर पर लक्षणों की निगरानी करें।",
-                  "mr": "ही सौम्य स्थिती असल्याचे दिसते. घरी लक्षणांवर लक्ष ठेवा."},
-    "MODERATE":  {"en": "This needs medical attention. Please consult a doctor within 24 hours.",
-                  "hi": "इसे चिकित्सा ध्यान की आवश्यकता है। कृपया 24 घंटे के भीतर डॉक्टर से परामर्श करें।",
-                  "mr": "यासाठी वैद्यकीय लक्ष आवश्यक आहे. कृपया 24 तासांच्या आत डॉक्टरांचा सल्ला घ्या."},
-    "HIGH":      {"en": "This is a serious condition. Seek medical care urgently.",
-                  "hi": "यह एक गंभीर स्थिति है। तुरंत चिकित्सा सहायता लें।",
-                  "mr": "ही गंभीर स्थिती आहे. तातडीने वैद्यकीय मदत घ्या."},
-    "EMERGENCY": {"en": "EMERGENCY — Seek immediate medical attention or call 108.",
-                  "hi": "आपातकाल — तुरंत चिकित्सा सहायता लें या 108 पर कॉल करें।",
-                  "mr": "आणीबाणी — तातडीने वैद्यकीय मदत घ्या किंवा 108 वर कॉल करा."},
+    "LOW": {
+        "en": "This appears to be a mild condition. Monitor symptoms at home.",
+        "hi": "यह एक हल्की स्थिति प्रतीत होती है। घर पर लक्षणों की निगरानी करें।",
+        "mr": "ही सौम्य स्थिती असल्याचे दिसते. घरी लक्षणांवर लक्ष ठेवा.",
+        "bn": "এটি একটি মৃদু অবস্থা বলে মনে হচ্ছে। বাড়িতে লক্ষণগুলি পর্যবেক্ষণ করুন।",
+        "te": "ఇది తేలికపాటి పరిస్థితిగా కనిపిస్తోంది. ఇంట్లో లక్షణాలను గమనించండి.",
+        "ta": "இது ஒரு லேசான நிலையாகத் தெரிகிறது. வீட்டிலேயே அறிகுறிகளைக் கண்காணிக்கவும்.",
+        "gu": "આ એક હળવી સ્થિતિ હોવાનું જણાય છે. ઘરે લક્ષણોનું નિરીક્ષણ કરો.",
+        "kn": "ಇದು ಸೌಮ್ಯ ಸ್ಥಿತಿ ಎಂದು ತೋರುತ್ತದೆ. ಮನೆಯಲ್ಲಿ ರೋಗಲಕ್ಷಣಗಳನ್ನು ಗಮನಿಸಿ.",
+        "ml": "ഇതൊരു ചെറിയ അവസ്ഥയാണെന്ന് തോന്നുന്നു. വീട്ടിൽ രോഗലക്ഷണങ്ങൾ നിരീക്ഷിക്കുക.",
+        "pa": "ਇਹ ਇੱਕ ਹਲਕੀ ਸਥਿਤੀ ਜਾਪਦੀ ਹੈ। ਘਰ ਵਿੱਚ ਲੱਛਣਾਂ ਦੀ ਨਿਗਰਾਨੀ ਕਰੋ।"
+    },
+    "MODERATE": {
+        "en": "This needs medical attention. Please consult a doctor within 24 hours.",
+        "hi": "इसे चिकित्सा ध्यान की आवश्यकता है। कृपया 24 घंटे के भीतर डॉक्टर से परामर्श करें।",
+        "mr": "यासाठी वैद्यकीय लक्ष आवश्यक आहे. कृपया 24 तासांच्या आत डॉक्टरांचा सल्ला घ्या.",
+        "bn": "এর জন্য চিকিৎসার প্রয়োজন। দয়া করে 24 ঘন্টার মধ্যে একজন ডাক্তারের পরামর্শ নিন।",
+        "te": "దీనికి వైద్య సహాయం అవసరం. దయచేసి 24 గంటలలోపు వైద్యుడిని సంప్రదించండి.",
+        "ta": "இதற்கு மருத்துவ கவனம் தேவை. 24 மணி நேரத்திற்குள் மருத்துவரை அணுகவும்.",
+        "gu": "આ માટે તબીબી ધ્યાનની જરૂર છે. કૃપા કરીને 24 કલાકની અંદર ડૉક્ટરની સલાહ લો.",
+        "kn": "ಇದಕ್ಕೆ ವೈದ್ಯಕೀಯ ಗಮನ ಅಗತ್ಯ. ದಯವಿಟ್ಟು 24 ಗಂಟೆಗಳ ಒಳಗೆ ವೈದ್ಯರನ್ನು ಸಂಪರ್ಕಿಸಿ.",
+        "ml": "ഇതിന് വൈദ്യസഹായം ആവശ്യമാണ്. 24 മണിക്കൂറിനുള്ളിൽ ഒരു ഡോക്ടറെ സമീപിക്കുക.",
+        "pa": "ਇਸ ਵੱਲ ਡਾਕਟਰੀ ਧਿਆਨ ਦੇਣ ਦੀ ਲੋੜ ਹੈ। ਕਿਰਪਾ ਕਰਕੇ 24 ਘੰਟਿਆਂ ਦੇ ਅੰਦਰ ਡਾਕਟਰ ਦੀ ਸਲਾહ ਲਓ।"
+    },
+    "HIGH": {
+        "en": "This is a serious condition. Seek medical care urgently.",
+        "hi": "यह एक गंभीर स्थिति है। तुरंत चिकित्सा सहायता लें।",
+        "mr": "ही गंभीर स्थिती आहे. तातडीने वैद्यकीय मदत घ्या.",
+        "bn": "এটি একটি গুরুতর অবস্থা। জরুরি ভিত্তিতে চিকিৎসা নিন।",
+        "te": "ఇది తీవ్రమైన పరిస్థితి. అత్యవసరంగా వైద్య సంరక్షణ పొందండి.",
+        "ta": "இது ஒரு தீவிரமான நிலை. அவசரமாக மருத்துவ உதவியை நாடுங்கள்.",
+        "gu": "આ એક ગંભીર સ્થિતિ છે. તાત્કાલિક તબીબી સંભાળ લો.",
+        "kn": "ಇದು ಗಂಭೀರ ಸ್ಥಿತಿಯಾಗಿದೆ. ತುರ್ತಾಗಿ ವೈದ್ಯಕೀಯ ಆರೈಕೆಯನ್ನು ಪಡೆಯಿರಿ.",
+        "ml": "ഇതൊരു ഗുരുതരമായ അവസ്ഥയാണ്. അടിയന്തരമായി വൈദ്യസഹായം തേടുക.",
+        "pa": "ਇਹ ਇੱਕ ਗੰਭੀਰ ਸਥਿਤੀ ਹੈ। ਤੁਰੰਤ ਡਾਕਟਰੀ ਦੇਖਭਾਲ ਲਓ।"
+    },
+    "EMERGENCY": {
+        "en": "EMERGENCY — Seek immediate medical attention or call 108.",
+        "hi": "आपातकाल — तुरंत चिकित्सा सहायता लें या 108 पर कॉल करें।",
+        "mr": "आणीबाणी — तातडीने वैद्यकीय मदत घ्या किंवा 108 वर कॉल करा.",
+        "bn": "জরুরী — অবিলম্বে চিকিৎসা সহায়তা নিন বা 108 নম্বরে কল করুন।",
+        "te": "అత్యవసర — తక్షణ వైద్య సహాయం తీసుకోండి లేదా 108కి కాల్ చేయండి.",
+        "ta": "அவசரம் — உடனடியாக மருத்துவ உதவியை நாடுங்கள் அல்லது 108 ஐ அழைக்கவும்.",
+        "gu": "કટોકટી — તાત્કાલિક તબીબી ધ્યાન લો અથવા 108 પર કૉલ કરો.",
+        "kn": "ತುರ್ತು — ತಕ್ಷಣ ವೈದ್ಯಕೀಯ ನೆರವು ಪಡೆಯಿರಿ ಅಥವಾ 108 ಗೆ ಕರೆ ಮಾಡಿ.",
+        "ml": "അടിയന്തരം — ഉടനടി വൈദ്യസഹായം തേടുക അല്ലെങ്കിൽ 108 ൽ വിളിക്കുക.",
+        "pa": "ਐਮਰਜੈਂਸੀ — ਤੁਰੰਤ ਡਾਕਟਰੀ ਸਹਾਇਤਾ ਲਓ ਜਾਂ 108 'ਤੇ ਕਾਲ ਕਰੋ।"
+    },
 }
+
+# Merged above.
 
 GENERAL_ADVICE = {
     "LOW": [
-        {"en": "Rest and stay hydrated", "hi": "आराम करें और पानी पीते रहें", "mr": "विश्रांती घ्या आणि पाणी प्या"},
-        {"en": "Monitor symptoms for 24-48 hours", "hi": "24-48 घंटे लक्षणों पर नज़र रखें", "mr": "24-48 तास लक्षणांवर लक्ष ठेवा"},
-        {"en": "Visit a doctor if symptoms worsen", "hi": "लक्षण बिगड़ने पर डॉक्टर को दिखाएं", "mr": "लक्षणे वाढल्यास डॉक्टरांना भेटा"},
+        {"en": "Rest and stay hydrated", "hi": "आराम करें और पानी पीते रहें", "mr": "विश्रांती घ्या आणि पाणी प्या", "bn": "বিশ্রাম নিন এবং হাইড্রেটেড থাকুন", "te": "విశ్రాంతి తీసుకోండి మరియు హైడ్రేటెడ్‌గా ఉండండి"},
+        {"en": "Monitor symptoms for 24-48 hours", "hi": "24-48 घंटे लक्षणों पर नज़र रखें", "mr": "24-48 तास लक्षणांवर लक्ष ठेवा", "bn": "24-48 ঘন্টার জন্য লক্ষণ পর্যবেক্ষণ করুন", "te": "24-48 గంటల పాటు లక్షణాలను గమనించండి"},
+        {"en": "Visit a doctor if symptoms worsen", "hi": "लक्षण बिगड़ने पर डॉक्टर को दिखाएं", "mr": "लक्षणे वाढल्यास डॉक्टरांना भेटा", "bn": "লক্ষণগুলি আরও খারাপ হলে ডাক্তারের কাছে যান", "te": "లక్షణాలు తీవ్రమైతే వైద్యుడిని సందర్శించండి"},
     ],
     "MODERATE": [
-        {"en": "Consult a doctor within 24 hours", "hi": "24 घंटे के भीतर डॉक्टर से मिलें", "mr": "24 तासांच्या आत डॉक्टरांना भेटा"},
-        {"en": "Avoid strenuous activity", "hi": "भारी शारीरिक गतिविधि से बचें", "mr": "कठोर शारीरिक हालचाली टाळा"},
-        {"en": "Keep a symptom diary to share with the doctor", "hi": "डॉक्टर को दिखाने के लिए लक्षणों की डायरी रखें", "mr": "डॉक्टरांना दाखवण्यासाठी लक्षणांची डायरी ठेवा"},
+        {"en": "Consult a doctor within 24 hours", "hi": "24 घंटे के भीतर डॉक्टर से मिलें", "mr": "24 तासांच्या आत डॉक्टरांना भेटा", "bn": "24 ঘন্টার মধ্যে একজন ডাক্তারের পরামর্শ নিন", "te": "24 గంటలలోపు వైద్యుడిని సంప్రదించండి"},
+        {"en": "Avoid strenuous activity", "hi": "भारी शारीरिक गतिविधि से बचें", "mr": "कठोर शारीरिक हालचाली टाळा", "bn": "কঠোর কার্যকলাপ এড়িয়ে চলুন", "te": "శ్రమతో కూడిన కార్యకలాపాలను నివారించండి"},
+        {"en": "Keep a symptom diary to share with the doctor", "hi": "डॉक्टर को दिखाने के लिए लक्षणों की डायरी रखें", "mr": "डॉक्टरांना दाखवण्यासाठी लक्षणांची डायरी ठेवा", "bn": "ডাক্তারের সাথে শেয়ার করার জন্য একটি লক্ষণ ডায়েরি রাখুন", "te": "వైద్యుడితో పంచుకోవడానికి లక్షణాల డైరీని ఉంచండి"},
     ],
     "HIGH": [
-        {"en": "Seek urgent medical care — visit ER or call your doctor now", "hi": "तुरंत चिकित्सा सहायता लें — ER जाएं या डॉक्टर को कॉल करें", "mr": "तातडीने वैद्यकीय मदत घ्या — ER ला जा किंवा डॉक्टरांना कॉल करा"},
-        {"en": "Do not ignore worsening symptoms", "hi": "बिगड़ते लक्षणों को नज़रअंदाज़ न करें", "mr": "वाढत्या लक्षणांकडे दुर्लक्ष करू नका"},
+        {"en": "Seek urgent medical care — visit ER or call your doctor now", "hi": "तुरंत चिकित्सा सहायता लें — ER जाएं या डॉक्टर को कॉल करें", "mr": "तातडीने वैद्यकीय मदत घ्या — ER ला जा किंवा डॉक्टरांना कॉल करा", "bn": "জরুরী চিকিৎসা সেবা নিন", "te": "అత్యవసర వైద్య సంరక్షణ పొందండి"},
+        {"en": "Do not ignore worsening symptoms", "hi": "बिगड़ते लक्षणों को नज़रअंदाज़ न करें", "mr": "वाढत्या लक्षणांकडे दुर्लक्ष करू नका", "bn": "অবনতিশীল লক্ষণগুলি এড়িয়ে যাবেন না", "te": "తీవ్రమవుతున్న లక్షణాలను విస్మరించవద్దు"},
     ],
     "EMERGENCY": [
-        {"en": "Call 108 (emergency ambulance) IMMEDIATELY", "hi": "तुरंत 108 (एम्बुलेंस) पर कॉल करें", "mr": "तातडीने 108 (ॲम्ब्युलन्स) वर कॉल करा"},
-        {"en": "If available, go to the nearest Emergency Room", "hi": "यदि संभव हो तो निकटतम आपातकालीन कक्ष जाएं", "mr": "शक्य असल्यास जवळच्या आपत्कालीन कक्षात जा"},
+        {"en": "Call 108 (emergency ambulance) IMMEDIATELY", "hi": "तुरंत 108 (एम्बुलेंस) पर कॉल करें", "mr": "तातडीने 108 (ॲम्ब्युलन्स) वर कॉल करा", "bn": "অবিলম্বে 108 কল করুন", "te": "వెంటనే 108 కి కాల్ చేయండి"},
+        {"en": "If available, go to the nearest Emergency Room", "hi": "यदि संभव हो तो निकटतम आपातकालीन कक्ष जाएं", "mr": "शक्य असल्यास जवळच्या आपत्कालीन कक्षात जा", "bn": "যদি সম্ভব হয়, কাছের জরুরী কক্ষে যান", "te": "వీలైతే, సమీప ఎమర్జెన్సీ గదికి వెళ్లండి"},
     ],
 }
 
 
 def detect_language(text: str) -> str:
-    """Detect if user is writing in Hindi/Marathi (Devanagari) or English."""
-    devanagari = len(re.findall(r'[\u0900-\u097F]', text))
-    latin = len(re.findall(r'[a-zA-Z]', text))
-    if devanagari > latin:
-        return "hi"  # Devanagari script — could be Hindi or Marathi
-    # Check for common Hindi romanized patterns
-    hindi_markers = ["mein", "hai", "ko", "ka", "ki", "se", "nahi", "hoon", "raha", "rahi", "bahut", "mere", "mera"]
+    """Detect script or simple heuristics for language."""
+    # This is a mock language detector for the synthetic generator.
+    # In a real pipeline, we'd use fasttext language detector.
     text_lower = text.lower()
-    hindi_score = sum(1 for m in hindi_markers if f" {m} " in f" {text_lower} ")
-    if hindi_score >= 2:
+    
+    # Check for indic scripts
+    if re.search(r'[\u0980-\u09FF]', text): return "bn" # Bengali
+    if re.search(r'[\u0C00-\u0C7F]', text): return "te" # Telugu
+    if re.search(r'[\u0B80-\u0BFF]', text): return "ta" # Tamil
+    if re.search(r'[\u0A80-\u0AFF]', text): return "gu" # Gujarati
+    if re.search(r'[\u0C80-\u0CFF]', text): return "kn" # Kannada
+    if re.search(r'[\u0D00-\u0D7F]', text): return "ml" # Malayalam
+    if re.search(r'[\u0A00-\u0A7F]', text): return "pa" # Punjabi
+    if re.search(r'[\u0900-\u097F]', text): return "hi" # Hindi/Marathi (Devanagari)
+    
+    # Check romanized heuristics
+    hindi_markers = ["mein", "hai", "ko", "ka", "ki", "se", "nahi", "hoon", "raha", "rahi", "bahut", "mere"]
+    if sum(1 for m in hindi_markers if f" {m} " in f" {text_lower} ") >= 2:
         return "hi"
     return "en"
 
@@ -273,52 +319,79 @@ def build_clinical_analysis(kg_result: dict, model_result: dict, final_predictio
     }
 
 
+# --- Generative Model Integration ---
+USE_GENERATIVE_MODEL = False  # Set to True once you finish QLoRA training on GPU
+
+if USE_GENERATIVE_MODEL:
+    try:
+        from model.generative_qlora_net import GenerativeQLoRANet
+        generative_model = GenerativeQLoRANet(use_4bit=True)
+        print("[BOOT] Generative QLoRA Model loaded successfully.")
+    except Exception as e:
+        print(f"[ERROR] Could not load Generative QLoRA Model: {e}")
+        USE_GENERATIVE_MODEL = False
+
 @app.post("/api/triage")
 async def triage(req: TriageRequest):
     """
     Core triage endpoint.
-
-    Pipeline:
-      1. Knowledge Graph resolves cultural idioms
-      2. Safety Gate checks for emergency overrides
-      3. Neural model classifies severity
-      4. Clinical analysis builder creates a rich report
+    If USE_GENERATIVE_MODEL is True, it queries the fine-tuned LLM which learned everything.
+    Otherwise, it uses the hybrid Neural-Symbolic classification pipeline.
     """
-    # Step 1 & 2: KG + Safety Gate
-    kg_result = kg_resolver.process(req.text)
-
-    # Step 3: Neural classification
-    model_result = model.predict(req.text, device=DEVICE)
-
-    # Step 4: Merge — safety override always wins
-    final_prediction = model_result["prediction"]
-    severity_rank = {"LOW": 0, "MODERATE": 1, "HIGH": 2, "EMERGENCY": 3}
-
-    # Upgrade if KG suggests higher
-    kg_sev = kg_result.get("kg_suggested_severity", "LOW")
-    if severity_rank.get(kg_sev, 0) > severity_rank.get(final_prediction, 0):
-        final_prediction = kg_sev
-
-    # Safety override is absolute
-    overrides = kg_result.get("safety_overrides", [])
-    if overrides:
-        final_prediction = "EMERGENCY"
-
-    # Step 5: Build rich clinical analysis
-    analysis = build_clinical_analysis(kg_result, model_result, final_prediction, req.text)
-
-    response = {
-        "prediction": final_prediction,
-        "model_prediction": model_result["prediction"],
-        "confidence": model_result["confidence"],
-        "probabilities": model_result["probabilities"],
-        "knowledge_graph_matches": kg_result["knowledge_graph"]["matches"],
-        "safety_overrides": overrides,
-        "safety_flags": [o["flag"] for o in overrides],
-        "safety_actions": [o["action"] for o in overrides],
-        "session_id": req.session_id,
-        "clinical_analysis": analysis,
-    }
+    if USE_GENERATIVE_MODEL:
+        result = generative_model.predict(req.text)
+        
+        if result["status"] == "error":
+            raise HTTPException(status_code=500, detail="Generative model failed to produce valid JSON")
+            
+        return {
+            "prediction": result["data"].get("severity", "UNKNOWN"),
+            "model_prediction": result["data"].get("severity", "UNKNOWN"),
+            "confidence": 0.99,
+            "probabilities": {"LOW": 0.25, "MODERATE": 0.25, "HIGH": 0.25, "EMERGENCY": 0.25},
+            "knowledge_graph_matches": [],
+            "safety_overrides": [],
+            "safety_flags": [f["flag"] for f in result["data"].get("safety_flags", [])],
+            "safety_actions": [f["action"] for f in result["data"].get("safety_flags", [])],
+            "session_id": req.session_id,
+            "clinical_analysis": result["data"]
+        }
+    else:
+        # Step 1 & 2: KG + Safety Gate
+        kg_result = kg_resolver.process(req.text)
+    
+        # Step 3: Neural classification
+        model_result = model.predict(req.text, device=DEVICE)
+    
+        # Step 4: Merge — safety override always wins
+        final_prediction = model_result["prediction"]
+        severity_rank = {"LOW": 0, "MODERATE": 1, "HIGH": 2, "EMERGENCY": 3}
+    
+        # Upgrade if KG suggests higher
+        kg_sev = kg_result.get("kg_suggested_severity", "LOW")
+        if severity_rank.get(kg_sev, 0) > severity_rank.get(final_prediction, 0):
+            final_prediction = kg_sev
+    
+        # Safety override is absolute
+        overrides = kg_result.get("safety_overrides", [])
+        if overrides:
+            final_prediction = "EMERGENCY"
+    
+        # Step 5: Build rich clinical analysis
+        analysis = build_clinical_analysis(kg_result, model_result, final_prediction, req.text)
+    
+        response = {
+            "prediction": final_prediction,
+            "model_prediction": model_result["prediction"],
+            "confidence": model_result["confidence"],
+            "probabilities": model_result["probabilities"],
+            "knowledge_graph_matches": kg_result["knowledge_graph"]["matches"],
+            "safety_overrides": overrides,
+            "safety_flags": [o["flag"] for o in overrides],
+            "safety_actions": [o["action"] for o in overrides],
+            "session_id": req.session_id,
+            "clinical_analysis": analysis,
+        }
 
     # Optional XAI
     if req.include_xai:
