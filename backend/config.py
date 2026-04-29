@@ -18,9 +18,12 @@ class Settings(BaseSettings):
     host: str = "0.0.0.0"
     port: int = 8000
 
-    # ── LLM / Groq ──────────────────────────────────────────
+    # ── LLM / Groq (used internally by reasoning pipeline nodes) ────
     groq_api_key: str = Field(default="", description="Groq API key for fast inference")
-    groq_model: str = Field(default="llama-3.3-70b-versatile", description="Default Groq model for reasoning")
+    groq_model: str = Field(default="llama-3.1-8b-instant", description="Groq model for internal pipeline nodes (intake, reasoning, synthesis)")
+
+    # ── LLM / Anthropic (used by Vapi as the voice orchestration LLM) ──
+    anthropic_model: str = Field(default="claude-opus-4-5", description="Anthropic model name for Vapi voice assistant orchestration")
 
     # ── Vapi AI (Telephony Orchestration) ────────────────────
     vapi_api_key: str = Field(default="", description="Vapi AI API key")
