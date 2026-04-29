@@ -57,8 +57,31 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("Knowledge base ready — %d documents available", collection.count())
 
+    # ── Auto-start ngrok tunnel ──────────────────────────────
+    tunnel = None
+    try:
+        from pyngrok import ngrok
+        tunnel = ngrok.connect(settings.port, bind_tls=True)
+        public_url = tunnel.public_url
+        webhook_url = f"{public_url}/api/vapi/webhook"
+        logger.info("=" * 60)
+        logger.info("  🌐  PUBLIC URL: %s", public_url)
+        logger.info("  📞  VAPI WEBHOOK: %s", webhook_url)
+        logger.info("  👆  Paste the webhook URL into Vapi Dashboard → Server URL")
+        logger.info("=" * 60)
+    except Exception as e:
+        logger.warning("ngrok tunnel failed (non-fatal): %s", e)
+        logger.info("Tip: pip install pyngrok && ngrok config add-authtoken YOUR_TOKEN")
+
     yield
 
+    # Cleanup tunnel on shutdown
+    if tunnel:
+        try:
+            from pyngrok import ngrok as _ngrok
+            _ngrok.disconnect(tunnel.public_url)
+        except Exception:
+            pass
     logger.info("Vikas.ai shutting down")
 
 

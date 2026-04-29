@@ -48,54 +48,62 @@ async def handle_assistant_request(payload: dict[str, Any]) -> dict[str, Any]:
             "transcriber": {
                 "provider": "deepgram",
                 "model": "nova-2",
-                "language": "hi", # Deepgram defaults, can be switched based on region or multi
+                # "multi" = Deepgram auto-detects language per utterance.
+                # Handles Hindi, Tamil, Telugu, Kannada, English, etc.
+                "language": "multi",
+                "smartFormat": True,
             },
             "model": {
                 "provider": "groq",
                 "model": settings.groq_model,
                 "temperature": 0.3,
                 "systemPrompt": (
-                    "You are Vikas, a compassionate health and civic information assistant. "
-                    "You help users who may have limited access to healthcare or "
-                    "government services. You speak clearly and simply. You ALWAYS cite your "
-                    "sources. You NEVER provide a medical diagnosis — you provide information "
-                    "and recommend consulting a doctor. If the user is in a medical emergency, "
-                    "immediately advise them to call emergency services. "
-                    "When the user describes symptoms, use the 'process_query' function to "
-                    "search verified medical databases and reason through the situation. "
-                    "CRITICAL: The user will speak to you in their native language (e.g. Hindi, Tamil, English). "
-                    "You must process their query and ALWAYS respond directly in their fluent, natural-sounding native language."
+                    "Aap Vikas hain — ek sahayak swasthya aur nagrik seva sahayak. "
+                    "Aap users ko asan Hindi mein medical jaankari aur government schemes ke baare mein "
+                    "sahi aur saral jawaab dete hain. "
+                    "Jab user koi lakshan bataye, to 'process_query' function ka upyog karein "
+                    "taaki aap PubMed research databases se sahi medical jaankari prapt kar sakein. "
+                    "IMPORTANT: "
+                    "1. Agar user Hindi mein bole, toh Hindi mein jawab dein. "
+                    "2. Agar user Tamil/Telugu/Kannada mein bole, toh usi bhasha mein jawab dein. "
+                    "3. Agar user English mein bole, toh English mein jawab dein. "
+                    "4. Hamesha research cite karein. "
+                    "5. Agar koi emergency ho, toh turant 112 call karne ki salah dein. "
+                    "Chhote, spasht vaakya use karein — yeh response phone par bol kar sunaya jayega."
                 ),
             },
             "voice": {
                 "provider": "azure",
-                "voiceId": "hi-IN-SwaraNeural",  # High quality Azure voice
+                # hi-IN-SwaraNeural = Microsoft's best Hindi female neural voice
+                # Alternatives: hi-IN-MadhurNeural (male), hi-IN-SwaraNeural (female)
+                "voiceId": "hi-IN-SwaraNeural",
             },
+            # First thing the AI says when the call connects
             "firstMessage": (
-                "Namaste! I am Vikas, your health and information assistant. "
-                "I can help you understand medical symptoms or find government services. "
-                "Please describe your situation, and I will do my best to help."
+                "Namaste! Main Vikas hun, aapka swasthya aur nagrik seva sahayak. "
+                "Aap mujhse Hindi, Tamil, ya English mein baat kar sakte hain. "
+                "Aaj main aapki kya madad kar sakta hun?"
             ),
+            # Said when the call ends
             "endCallMessage": (
-                "Thank you for calling. Please remember, I am an automated service. "
-                "Always consult a qualified professional for important health decisions. "
-                "Take care!"
+                "Dhanyavaad. Apna khayal rakhen. "
+                "Kisi bhi gambhir sthiti mein kisi daktar se zaroor milaen."
             ),
-            "serverUrl": None,  # Vapi will use the URL it already has
+            "serverUrl": None,  # Vapi uses the webhook URL it already has
             "functions": [
                 {
                     "name": "process_query",
                     "description": (
-                        "Analyse the user's health concern or civic query using verified "
-                        "medical databases and multi-step reasoning. Returns an evidence-based, "
-                        "cited response."
+                        "Analyse the user's health concern or civic query using peer-reviewed "
+                        "PubMed medical research and multi-step clinical reasoning. "
+                        "Returns an evidence-based, cited response in the user's language."
                     ),
                     "parameters": {
                         "type": "object",
                         "properties": {
                             "user_message": {
                                 "type": "string",
-                                "description": "The user's spoken message describing their situation.",
+                                "description": "The user's spoken message, exactly as transcribed.",
                             },
                         },
                         "required": ["user_message"],
