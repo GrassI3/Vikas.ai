@@ -11,6 +11,11 @@ Endpoints:
 
 import os
 import sys
+
+# Force HuggingFace offline mode to prevent WinError 10054 connection crashes
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
+
 import re
 import sqlite3
 import asyncio
