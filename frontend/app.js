@@ -65,25 +65,27 @@ async function checkHealth() {
 }
 
 function updateKPIs(data) {
-  $("#kpi-docs-value").textContent = data.knowledge_base_docs ?? "—";
-  $("#kpi-groq-value").textContent = data.groq_configured ? "✓ Ready" : "✗ Missing";
-  $("#kpi-groq-value").style.color = data.groq_configured ? "var(--accent-emerald)" : "var(--accent-rose)";
-  $("#kpi-vapi-value").textContent = data.vapi_configured ? "✓ Ready" : "✗ Missing";
-  $("#kpi-vapi-value").style.color = data.vapi_configured ? "var(--accent-emerald)" : "var(--accent-rose)";
-  $("#kpi-twilio-value").textContent = data.twilio_configured ? "✓ Ready" : "✗ Missing";
-  $("#kpi-twilio-value").style.color = data.twilio_configured ? "var(--accent-emerald)" : "var(--accent-rose)";
+  const docsEl = $("#kpi-docs-value");
+  const groqEl = $("#kpi-groq-value");
+  const vapiEl = $("#kpi-vapi-value");
+  const twilioEl = $("#kpi-twilio-value");
+  if (docsEl) docsEl.textContent = data.knowledge_base_docs ?? "—";
+  if (groqEl) { groqEl.textContent = data.groq_configured ? "✓ Ready" : "✗ Missing"; groqEl.style.color = data.groq_configured ? "var(--accent-emerald)" : "var(--accent-rose)"; }
+  if (vapiEl) { vapiEl.textContent = data.vapi_configured ? "✓ Ready" : "✗ Missing"; vapiEl.style.color = data.vapi_configured ? "var(--accent-emerald)" : "var(--accent-rose)"; }
+  if (twilioEl) { twilioEl.textContent = data.twilio_configured ? "✓ Ready" : "✗ Missing"; twilioEl.style.color = data.twilio_configured ? "var(--accent-emerald)" : "var(--accent-rose)"; }
 }
 
 function updateKPIsOffline() {
   ["#kpi-docs-value", "#kpi-groq-value", "#kpi-vapi-value", "#kpi-twilio-value"].forEach((sel) => {
-    $(sel).textContent = "—";
-    $(sel).style.color = "";
+    const el = $(sel);
+    if (el) { el.textContent = "—"; el.style.color = ""; }
   });
 }
 
 // ── Language Grid ──────────────────────────────────────────
 function renderLanguageGrid() {
   const grid = $("#lang-grid");
+  if (!grid) return;
   grid.innerHTML = LANGUAGES.map(
     (l) => `<div class="lang-chip"><span class="lang-flag">${l.flag}</span><span>${l.native} <span style="color:var(--text-muted);font-size:0.72rem">(${l.name})</span></span></div>`
   ).join("");
@@ -280,3 +282,115 @@ renderLanguageGrid();
 renderKBTable();
 checkHealth();
 setInterval(checkHealth, 15000);
+
+// ── Recordings — OTP Auth + Call History ────────────────────
+
+let verifiedPhone = null;
+
+$("#rec-send-otp").addEventListener("click", async () => {
+  const phone = $("#rec-phone").value.trim();
+  if (!phone) return;
+
+  const status = $("#rec-auth-status");
+  status.textContent = "Sending OTP…";
+  status.style.color = "var(--text-secondary)";
+
+  try {
+    const resp = await fetch(`${API_BASE}/api/auth/request-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone_number: phone }),
+    });
+    const data = await resp.json();
+    if (data.status === "ok") {
+      status.textContent = "✓ OTP sent! Check your phone.";
+      status.style.color = "var(--accent-emerald)";
+      $("#otp-input-section").style.display = "block";
+    } else {
+      status.textContent = "✗ Failed to send OTP";
+      status.style.color = "var(--accent-rose)";
+    }
+  } catch (err) {
+    status.textContent = `✗ Error: ${err.message}`;
+    status.style.color = "var(--accent-rose)";
+  }
+});
+
+$("#rec-verify-otp").addEventListener("click", async () => {
+  const phone = $("#rec-phone").value.trim();
+  const code = $("#rec-otp").value.trim();
+  if (!phone || !code) return;
+
+  const status = $("#rec-auth-status");
+  status.textContent = "Verifying…";
+
+  try {
+    const resp = await fetch(`${API_BASE}/api/auth/verify-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone_number: phone, code }),
+    });
+    const data = await resp.json();
+
+    if (data.status === "ok") {
+      verifiedPhone = phone;
+      $("#recordings-auth").style.display = "none";
+      $("#recordings-list").style.display = "block";
+      $("#rec-phone-display").textContent = `Recordings for ${phone}`;
+      renderRecordings(data.recordings || []);
+    } else {
+      status.textContent = "✗ " + (data.message || "Invalid OTP");
+      status.style.color = "var(--accent-rose)";
+    }
+  } catch (err) {
+    status.textContent = `✗ Error: ${err.message}`;
+    status.style.color = "var(--accent-rose)";
+  }
+});
+
+$("#rec-logout").addEventListener("click", () => {
+  verifiedPhone = null;
+  $("#recordings-auth").style.display = "block";
+  $("#recordings-list").style.display = "none";
+  $("#rec-phone").value = "";
+  $("#rec-otp").value = "";
+  $("#otp-input-section").style.display = "none";
+  $("#rec-auth-status").textContent = "";
+});
+
+function renderRecordings(recordings) {
+  const container = $("#rec-cards");
+  const emptyMsg = $("#rec-empty");
+
+  if (!recordings.length) {
+    container.innerHTML = "";
+    emptyMsg.style.display = "block";
+    return;
+  }
+
+  emptyMsg.style.display = "none";
+  container.innerHTML = recordings
+    .map(
+      (r) => `
+    <div class="glass-card" style="margin-bottom: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+        <strong style="font-size: 0.9rem;">${escapeHtml(r.id || "Call")}</strong>
+        <span style="font-size: 0.8rem; color: var(--text-secondary);">${r.created_at || ""}</span>
+      </div>
+      ${r.summary ? `<p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.75rem;">${escapeHtml(r.summary)}</p>` : ""}
+      ${r.duration ? `<p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem;">Duration: ${r.duration}s</p>` : ""}
+      ${
+        r.recording
+          ? `<audio controls preload="none" style="width: 100%; margin-bottom: 0.5rem;"><source src="${escapeHtml(r.recording)}" type="audio/wav">Your browser does not support audio.</audio>`
+          : `<p style="font-size: 0.85rem; color: var(--text-muted);">No recording available</p>`
+      }
+      ${
+        r.transcript
+          ? `<details style="margin-top: 0.5rem;"><summary style="cursor: pointer; font-size: 0.85rem; color: var(--text-secondary);">View Transcript</summary><pre style="white-space: pre-wrap; font-size: 0.85rem; margin-top: 0.5rem; padding: 0.75rem; background: var(--bg-hover); border-radius: var(--radius-sm);">${escapeHtml(r.transcript)}</pre></details>`
+          : ""
+      }
+    </div>
+  `
+    )
+    .join("");
+}
