@@ -29,6 +29,8 @@ from backend.knowledge.ingest import ingest_seed_data
 from backend.knowledge.vector_db import get_or_create_collection
 from backend.telephony.vapi_handler import handle_vapi_webhook
 from backend.utils.guardrails import validate_output
+from backend.utils.db import init_db, store_otp, check_otp, get_calls_for_phone
+from backend.utils.auth import send_otp
 
 # ── Logging ─────────────────────────────────────────────────
 logging.basicConfig(
@@ -47,6 +49,9 @@ async def lifespan(app: FastAPI):
     logger.info("=" * 60)
     logger.info("  🚀  Vikas.ai — Decision Support Assistant  v%s", settings.app_version)
     logger.info("=" * 60)
+
+    # Initialize SQLite database
+    init_db()
 
     # Ensure ChromaDB collection exists
     collection = get_or_create_collection()
@@ -132,6 +137,17 @@ class QueryResponse(BaseModel):
 class IngestRequest(BaseModel):
     """Document ingestion request."""
     documents: list[dict[str, Any]]
+
+
+class OTPRequest(BaseModel):
+    """OTP request — send a code to this phone."""
+    phone_number: str
+
+
+class OTPVerify(BaseModel):
+    """OTP verification request."""
+    phone_number: str
+    code: str
 
 
 # ── Endpoints ───────────────────────────────────────────────
@@ -232,6 +248,98 @@ async def ingest_pubmed(request: PubMedRequest):
         "articles_ingested": count,
         "total_knowledge_base": collection.count(),
     }
+
+
+# ── Authentication & Recordings ─────────────────────────────
+
+@app.post("/api/auth/request-otp", tags=["Auth"])
+async def request_otp(req: OTPRequest):
+    """Send a 6-digit OTP to the given phone number."""
+    code = send_otp(req.phone_number)
+    store_otp(req.phone_number, code)
+    return {"status": "ok", "message": "OTP sent"}
+
+
+@app.post("/api/auth/verify-otp", tags=["Auth"])
+async def verify_otp(req: OTPVerify):
+    """Verify the OTP. Returns the user's call recordings on success."""
+    if not check_otp(req.phone_number, req.code):
+        return {"status": "error", "message": "Invalid or expired OTP"}
+
+    # Try local DB first, fallback to Vapi API
+    recordings = get_calls_for_phone(req.phone_number)
+    if not recordings:
+        recordings = await _fetch_vapi_calls(req.phone_number)
+    return {"status": "ok", "recordings": recordings}
+
+
+@app.post("/api/recordings", tags=["Recordings"])
+async def get_recordings(req: OTPRequest):
+    """Fetch recordings for a verified phone number."""
+    recordings = get_calls_for_phone(req.phone_number)
+    if not recordings:
+        recordings = await _fetch_vapi_calls(req.phone_number)
+    return {"status": "ok", "recordings": recordings}
+
+
+async def _fetch_vapi_calls(phone: str) -> list[dict]:
+    """Fetch call recordings from the Vapi API for a specific phone number."""
+    import httpx
+    from backend.utils.db import save_call
+
+    if not settings.vapi_api_key:
+        logger.warning("Vapi API key not configured, cannot fetch recordings")
+        return []
+
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.get(
+                "https://api.vapi.ai/call",
+                headers={"Authorization": f"Bearer {settings.vapi_api_key}"},
+            )
+            resp.raise_for_status()
+            all_calls = resp.json()
+
+        results = []
+        for call in all_calls:
+            customer_phone = call.get("customer", {}).get("number", "")
+            if customer_phone != phone:
+                continue
+
+            call_id = call.get("id", "")
+            recording = call.get("recordingUrl", "") or call.get("artifact", {}).get("recordingUrl", "")
+
+            raw_transcript = call.get("transcript", "") or call.get("artifact", {}).get("transcript", "")
+            if isinstance(raw_transcript, list):
+                transcript = "\n".join(f"{t.get('role','?')}: {t.get('text','')}" for t in raw_transcript)
+            else:
+                transcript = str(raw_transcript) if raw_transcript else ""
+
+            summary = call.get("analysis", {}).get("summary", "")
+            duration = call.get("duration", 0)
+            created_at = call.get("createdAt", "")
+
+            record = {
+                "id": call_id,
+                "phone": customer_phone,
+                "recording": recording,
+                "transcript": transcript,
+                "summary": summary,
+                "duration": duration,
+                "created_at": created_at,
+            }
+            results.append(record)
+
+            # Also cache in local DB for next time
+            if call_id:
+                save_call(call_id, customer_phone, recording, transcript, summary, duration)
+
+        logger.info("Fetched %d calls from Vapi API for %s", len(results), phone)
+        return results
+
+    except Exception as e:
+        logger.error("Failed to fetch calls from Vapi API: %s", e)
+        return []
 
 
 # ── WebSocket — Live Transcript Stream ──────────────────────

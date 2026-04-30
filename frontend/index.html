@@ -47,6 +47,7 @@
       <button class="nav-tab" data-tab="query" id="nav-query" style="display: none;">Test Query</button>
       <button class="nav-tab" data-tab="knowledge" id="nav-knowledge">Knowledge Base</button>
       <button class="nav-tab" data-tab="pipeline" id="nav-pipeline">Pipeline Inspector</button>
+      <button class="nav-tab" data-tab="recordings" id="nav-recordings">My Recordings</button>
     </div>
     <div class="nav-status">
       <div class="status-dot" id="server-status-dot"></div>
@@ -329,6 +330,41 @@
       </div>
 
       <p class="pipeline-hint">Run a query from the "Test Query" tab to see the pipeline in action.</p>
+    </section>
+
+    <!-- ═══ TAB 5: My Recordings ══════════════════════════ -->
+    <section id="tab-recordings" class="tab-panel">
+      <h2>My Recordings</h2>
+      <p class="subtitle">Verify your phone number to access your call history and recordings.</p>
+
+      <!-- OTP Login -->
+      <div id="recordings-auth" class="glass-card" style="max-width: 480px; margin-top: 2rem;">
+        <h3>Phone Verification</h3>
+        <div class="input-group" style="margin-top: 1rem;">
+          <label for="rec-phone">Phone Number</label>
+          <input type="tel" id="rec-phone" class="text-input" placeholder="+91 98765 43210" />
+        </div>
+        <button id="rec-send-otp" class="btn-primary" style="margin-bottom: 1rem;">Send OTP</button>
+
+        <div id="otp-input-section" style="display: none;">
+          <div class="input-group">
+            <label for="rec-otp">Enter 6-digit OTP</label>
+            <input type="text" id="rec-otp" class="text-input" maxlength="6" placeholder="123456" />
+          </div>
+          <button id="rec-verify-otp" class="btn-primary">Verify &amp; View Recordings</button>
+        </div>
+        <p id="rec-auth-status" style="margin-top: 0.75rem; font-size: 0.9rem;"></p>
+      </div>
+
+      <!-- Recordings List (shown after verification) -->
+      <div id="recordings-list" style="display: none; margin-top: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3 id="rec-phone-display"></h3>
+          <button id="rec-logout" class="btn-secondary" style="font-size: 0.85rem;">Logout</button>
+        </div>
+        <div id="rec-cards"></div>
+        <p id="rec-empty" style="display: none; color: var(--text-muted); text-align: center; padding: 3rem 0;">No recordings found for this number yet. Make a call first!</p>
+      </div>
     </section>
   </main>
 

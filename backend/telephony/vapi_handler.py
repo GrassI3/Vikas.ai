@@ -169,15 +169,56 @@ async def handle_function_call(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 async def handle_end_of_call(payload: dict[str, Any]) -> dict[str, Any]:
-    """Handle the end-of-call report — log analytics and clean up session."""
-    call_id = payload.get("call", {}).get("id", "unknown")
-    transcript = payload.get("transcript", "")
-    duration = payload.get("call", {}).get("duration", 0)
+    """Handle the end-of-call report — save recording and clean up session."""
+    import json
+    from backend.utils.db import save_call
+
+    # Vapi nests everything under "message"
+    msg = payload.get("message", {})
+
+    # Log the raw payload keys for debugging
+    logger.info("end-of-call-report payload keys: %s", list(msg.keys()))
+    logger.info("end-of-call-report raw (truncated): %s", json.dumps(msg, default=str)[:2000])
+
+    # Extract call data — Vapi puts it in message.call
+    call_obj = msg.get("call", {})
+    call_id = call_obj.get("id", "unknown")
+    phone = call_obj.get("customer", {}).get("number", "unknown")
+    duration = call_obj.get("duration", 0)
+
+    # Recording URL can be at message.recordingUrl or message.artifact.recordingUrl
+    recording = (
+        msg.get("recordingUrl", "")
+        or msg.get("artifact", {}).get("recordingUrl", "")
+        or call_obj.get("recordingUrl", "")
+    )
+
+    # Transcript — can be a string or a list of objects
+    raw_transcript = msg.get("transcript", "") or msg.get("artifact", {}).get("transcript", "")
+    if isinstance(raw_transcript, list):
+        transcript = "\n".join(
+            f"{t.get('role', '?')}: {t.get('text', '')}" for t in raw_transcript
+        )
+    else:
+        transcript = str(raw_transcript)
+
+    # Summary / analysis
+    summary = (
+        msg.get("analysis", {}).get("summary", "")
+        or msg.get("summary", "")
+    )
 
     logger.info(
-        "Call ended (id=%s, duration=%ds, transcript_length=%d chars)",
-        call_id, duration, len(transcript),
+        "Call ended (id=%s, phone=%s, duration=%ds, has_recording=%s, transcript_len=%d)",
+        call_id, phone, duration, bool(recording), len(transcript),
     )
+
+    # Persist call record to SQLite — save even without recording
+    if phone != "unknown":
+        save_call(call_id, phone, recording, transcript, summary, duration)
+        logger.info("Call record saved for %s", phone)
+    else:
+        logger.warning("No customer phone found in end-of-call payload, skipping save")
 
     # Clean up session
     _sessions.pop(call_id, None)
@@ -207,3 +248,4 @@ async def handle_vapi_webhook(payload: dict[str, Any]) -> dict[str, Any]:
 
     logger.debug("Unhandled Vapi event type: %s", event_type)
     return {"status": "ignored", "event": event_type}
+
