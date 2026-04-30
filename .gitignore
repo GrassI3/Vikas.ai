@@ -1,3 +1,4 @@
 .env
 __pycache__
 backend/data/chroma_db
+backend/data/vikas.db
